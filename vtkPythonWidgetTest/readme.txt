@@ -1,0 +1,1 @@
+Now vtkPythonCommand only support string callback data. But you could extern

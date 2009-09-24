@@ -15,8 +15,7 @@ VTK_DATA_ROOT = vtkGetDataRoot()
 
 def vtkDistanceCallback(obj, event, pid):
 	global ren1, renWin, rep
-	print dir(event)
-	print pid
+	
 	if event == "InteractionEvent" or event == "EndInteractionEvent":
 		pos1 = [0]*3
 		pos2 = [0]*3
@@ -59,6 +58,7 @@ def vtkDistanceCallback(obj, event, pid):
 		if enabled:
 			obj.SetEnabled(1)
 
+vtkDistanceCallback.CallDataType = 'string0'
 
 # Create the RenderWindow, Renderer and both Actors
 ren1 = vtk.vtkRenderer()
@@ -90,10 +90,10 @@ widget.SetInteractor(iren)
 widget.CreateDefaultRepresentation()
 widget.SetRepresentation(rep)
 
-widget.AddObserver("InteractionEvent", lambda o, e, p=12: vtkDistanceCallback(o, e, p))
-widget.AddObserver("EndInteractionEvent", lambda o, e, p=12: vtkDistanceCallback(o, e, p))
-widget.AddObserver("PlacePointEvent", lambda o, e, p=12: vtkDistanceCallback(o, e, p))
-widget.AddObserver("StartInteractionEvent", lambda o, e, p=12: vtkDistanceCallback(o, e, p))
+widget.AddObserver("InteractionEvent", vtkDistanceCallback)
+widget.AddObserver("EndInteractionEvent", vtkDistanceCallback)
+widget.AddObserver("PlacePointEvent", vtkDistanceCallback)
+widget.AddObserver("StartInteractionEvent", vtkDistanceCallback)
 
 # Add the actor to the renderer, set the background and size
 ren1.AddActor(actor)
