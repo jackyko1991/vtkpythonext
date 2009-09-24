@@ -16,7 +16,7 @@ if len(sys.argv) < 2:
 		"\tIf a polydata is specified, an initial contour is constucted from\n" \
 		"the points in the polydata. The polydata is expected to be a polyline\n" \
 		"(one cell and two or more points on that cell)."
-	print "\n\nUsage: " << argv[0] << "\n" \
+	print "\n\nUsage: " , sys.argv[0] ,"\n" \
 		"  [-ProjectionMode (0,1 or 2)]\n" \
 		"  [-HeightOffset heightOffset]\n" \
 		"  [-InitialPath SomeVTKXmlfileContainingPath.vtk]" 
