@@ -278,6 +278,23 @@ public:  \
 }
 #endif
 
+#ifdef YLTK_LEAN_AND_MEAN
+#define yltkLogMacroStatic( obj, x, y)
+#else
+#define yltkLogMacroStatic( obj, x, y)  \
+{         \
+	if (obj->GetLogger() ) \
+	{  \
+	if (obj->GetLogger()->ShouldBuildMessage( ::igstk::Logger::x ) ) \
+	  { \
+	  ::itk::OStringStream message; \
+	  message << y; \
+	  obj->GetLogger()->Write(::itk::Logger::x, message.str()); \
+	  } \
+	}  \
+}
+#endif
+
 /** A convenience macro marks variables as not being used by a method,
 * avoiding compile-time warnings. */
 #define yltkNotUsed(x)
