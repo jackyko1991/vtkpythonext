@@ -1,5 +1,7 @@
 #include "yltkMetaDataObjectBase.h"
 #include "yltkObjectFactory.h"
+#include "yltkCommand.h"
+#include "yltkFastMutexLock.h"
 
 void yltk::MetaDataObjectBase::Print(std::ostream& os) const
 {
