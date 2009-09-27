@@ -2,11 +2,13 @@
 #define __yltkMacros_h
 
 #include <cstdlib>
+#include <sstream>
 
 namespace yltk{
 
 
 #define YLTK_LEAN_AND_MEAN
+#define YLTK_TEMPLATE_TXX	1
 
 /** Set built-in type.  Creates member Set"name"() (e.g., SetTimeStep(time)); */
 #define  yltkSetMacro(name,type) \
@@ -242,7 +244,7 @@ public:  \
 	} \
 	virtual ::yltk::LightObject::Pointer CreateAnother(void) const \
 	{ \
-		::itk::LightObject::Pointer smartPtr;         \
+		::yltk::LightObject::Pointer smartPtr;         \
 		smartPtr = x::New().GetPointer(); \
 		return smartPtr; \
 	}
@@ -279,5 +281,59 @@ public:  \
 /** A convenience macro marks variables as not being used by a method,
 * avoiding compile-time warnings. */
 #define yltkNotUsed(x)
+
+
+namespace yltk
+{
+
+	/**
+	* yltk::OStringStream wrapper to hide differences between
+	* std::ostringstream and the old ostrstream.  Necessary for
+	* portability.
+	*/
+#if !defined(YLTK_NO_ANSI_STRING_STREAM)
+	class OStringStream: public std::ostringstream
+	{
+	public:
+		OStringStream() {}
+	private:
+		OStringStream(const OStringStream&);
+		void operator=(const OStringStream&);
+	};
+#else
+	namespace OStringStreamDetail
+	{
+		class Cleanup
+		{
+		public:
+			Cleanup(std::ostrstream& ostr): m_OStrStream(ostr) {}
+			~Cleanup() { m_OStrStream.rdbuf()->freeze(0); }
+			static void IgnoreUnusedVariable(const Cleanup&) {}
+		protected:
+			std::ostrstream& m_OStrStream;
+		};
+	}//namespace OStringStreamDetail
+
+	class OStringStream: public std::ostrstream
+	{
+	public:
+		typedef std::ostrstream Superclass;
+		OStringStream() {}
+		std::string str()
+		{
+			OStringStreamDetail::Cleanup cleanup(*this);
+			OStringStreamDetail::Cleanup::IgnoreUnusedVariable(cleanup);
+			int pcount = this->pcount();
+			const char* ptr = this->Superclass::str();
+			return std::string(ptr?ptr:"", pcount);
+		}
+	private:
+		OStringStream(const OStringStream&);
+		void operator=(const OStringStream&);
+	};
+#endif
+
+}//namespace yltk
+
 
 #endif

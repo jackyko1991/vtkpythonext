@@ -1,6 +1,6 @@
 #include "yltkObject.h"
 #include "yltkObjectFactory.h"
-//#include "yltkCommand.h"
+#include "yltkCommand.h"
 
 namespace yltk{
 	/**
@@ -8,7 +8,7 @@ namespace yltk{
 	*/
 	bool Object::m_GlobalWarningDisplay = true;
 
-	/*class Observer
+	class Observer
 	{
 	public:
 		Observer(Command* c,
@@ -41,156 +41,126 @@ namespace yltk{
 		bool PrintObservers(std::ostream& os, Indent indent) const;
 	private:
 		std::list<Observer* > m_Observers;
-		unsigned long m_Count;
+		unsigned long m_Count;	// the count of observers, as event's tag
 	};
 
-	SubjectImplementation::
-		~SubjectImplementation()
+	SubjectImplementation::~SubjectImplementation()
 	{
-		for(std::list<Observer* >::iterator i = m_Observers.begin();
-			i != m_Observers.end(); ++i)
+		for(std::list<Observer* >::iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
 		{
 			delete (*i);
 		}
 	}
 
-	unsigned long
-	SubjectImplementation::
-	AddObserver(const EventObject & event,
-	Command* cmd)
+	unsigned long SubjectImplementation::AddObserver(const EventObject & event, Command* cmd)
 	{
-	Observer* ptr = new Observer(cmd, event.MakeObject(), m_Count);
-	m_Observers.push_back(ptr);
-	m_Count++;
-	return ptr->m_Tag;
+		Observer* ptr = new Observer(cmd, event.MakeObject(), m_Count);
+		m_Observers.push_back(ptr);
+		m_Count++;
+		return ptr->m_Tag;
 	}
 
 
-	unsigned long
-	SubjectImplementation::
-	AddObserver(const EventObject & event,
-	Command* cmd) const
+	unsigned long SubjectImplementation::AddObserver(const EventObject & event, Command* cmd) const
 	{
-	Observer* ptr = new Observer(cmd, event.MakeObject(), m_Count);
-	SubjectImplementation * me = const_cast<SubjectImplementation *>( this );
-	me->m_Observers.push_back(ptr);
-	me->m_Count++;
-	return ptr->m_Tag;
+		Observer* ptr = new Observer(cmd, event.MakeObject(), m_Count);
+		SubjectImplementation * me = const_cast<SubjectImplementation *>( this );
+		me->m_Observers.push_back(ptr);
+		me->m_Count++;
+		return ptr->m_Tag;
 	}
 
 
-	void
-	SubjectImplementation::
-	RemoveObserver(unsigned long tag)
+	void SubjectImplementation::RemoveObserver(unsigned long tag)
 	{
-	for(std::list<Observer* >::iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	if((*i)->m_Tag == tag)
-	{
-	delete (*i);
-	m_Observers.erase(i);
-	return;
-	}
-	}
+		for(std::list<Observer* >::iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
+		{
+			if((*i)->m_Tag == tag)
+			{
+				delete (*i);
+				m_Observers.erase(i);
+				return;
+			}
+		}
 	}
 
 
-	void
-	SubjectImplementation::
-	RemoveAllObservers()
+	void SubjectImplementation::RemoveAllObservers()
 	{
-	for(std::list<Observer* >::iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	delete (*i);
-	}
-	m_Observers.clear();
+		for(std::list<Observer* >::iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
+		{
+			delete (*i);
+		}
+		m_Observers.clear();
 	}
 
 
-	void
-	SubjectImplementation::
-	InvokeEvent( const EventObject & event,
-	Object* self)
+	void SubjectImplementation::InvokeEvent( const EventObject & event, Object* self)
 	{
-	for(std::list<Observer* >::iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	const EventObject * e =  (*i)->m_Event;
-	if(e->CheckEvent(&event))
-	{
-	(*i)->m_Command->Execute(self, event);
-	}
-	}
+		for(std::list<Observer* >::iterator i = m_Observers.begin();
+		i != m_Observers.end(); ++i)
+		{
+			const EventObject * e =  (*i)->m_Event;
+			if(e->CheckEvent(&event))
+			{
+				(*i)->m_Command->Execute(self, event);
+			}
+		}
 	}
 
-	void
-	SubjectImplementation::
-	InvokeEvent( const EventObject & event,
-	const Object* self)
+	void SubjectImplementation::InvokeEvent( const EventObject & event, const Object* self)
 	{
-	for(std::list<Observer* >::iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	const EventObject * e =  (*i)->m_Event;
-	if(e->CheckEvent(&event))
-	{
-	(*i)->m_Command->Execute(self, event);
-	}
-	}
+		for(std::list<Observer* >::iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
+		{
+			const EventObject * e =  (*i)->m_Event;
+			if(e->CheckEvent(&event))
+			{
+				(*i)->m_Command->Execute(self, event);
+			}
+		}
 	}
 
 
-	Command*
-	SubjectImplementation::
-	GetCommand(unsigned long tag)
+	Command* SubjectImplementation::GetCommand(unsigned long tag)
 	{
-	for(std::list<Observer* >::iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	if ( (*i)->m_Tag == tag)
-	{
-	return (*i)->m_Command;
-	}
-	}
-	return 0;
+		for(std::list<Observer* >::iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
+		{
+			if ( (*i)->m_Tag == tag)
+			{
+				return (*i)->m_Command;
+			}
+		}
+		return 0;
 	}
 
-	bool
-	SubjectImplementation::
-	HasObserver(const EventObject & event) const
+	bool SubjectImplementation::HasObserver(const EventObject & event) const
 	{
-	for(std::list<Observer* >::const_iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	const EventObject * e =  (*i)->m_Event;
-	if(e->CheckEvent(&event))
-	{
-	return true;
-	}
-	}
-	return false;
+		for(std::list<Observer* >::const_iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
+		{
+			const EventObject * e =  (*i)->m_Event;
+			if(e->CheckEvent(&event))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
-	bool
-	SubjectImplementation::
-	PrintObservers(std::ostream& os, Indent indent) const
+	bool SubjectImplementation::PrintObservers(std::ostream& os, Indent indent) const
 	{
-	if(m_Observers.empty())
-	{
-	return false;
-	}
+		if(m_Observers.empty())
+		{
+			return false;
+		}
 
-	for(std::list<Observer* >::const_iterator i = m_Observers.begin();
-	i != m_Observers.end(); ++i)
-	{
-	const EventObject * e =  (*i)->m_Event;
-	const Command* c = (*i)->m_Command;
-	os << indent << e->GetEventName() << "(" << c->GetNameOfClass() << ")\n";
+		for(std::list<Observer* >::const_iterator i = m_Observers.begin();i != m_Observers.end(); ++i)
+		{
+			const EventObject * e =  (*i)->m_Event;
+			const Command* c = (*i)->m_Command;
+			os << indent << e->GetEventName() << "(" << c->GetNameOfClass() << ")\n";
+		}
+		return true;
 	}
-	return true;
-	}*/
 
 	Object::Pointer Object::New()
 	{
@@ -205,8 +175,7 @@ namespace yltk{
 		return smartPtr;
 	}
 
-	LightObject::Pointer
-	Object::CreateAnother() const
+	LightObject::Pointer Object::CreateAnother() const
 	{
 		return Object::New().GetPointer();
 	}
@@ -263,7 +232,7 @@ namespace yltk{
 	void Object::Modified() const
 	{
 		m_MTime.Modified();
-		//InvokeEvent( ModifiedEvent() );
+		this->InvokeEvent( ModifiedEvent() );
 	}
 
 
@@ -294,7 +263,7 @@ namespace yltk{
 			/**
 			* If there is a delete method, invoke it.
 			*/
-		//	this->InvokeEvent(DeleteEvent());
+			this->InvokeEvent(DeleteEvent());
 		}
 
 		Superclass::UnRegister();
@@ -315,7 +284,7 @@ namespace yltk{
 			/**
 			* If there is a delete method, invoke it.
 			*/
-		//	this->InvokeEvent(DeleteEvent());
+			this->InvokeEvent(DeleteEvent());
 		}
 
 		Superclass::SetReferenceCount(ref);
@@ -340,7 +309,7 @@ namespace yltk{
 	}
 
 
-	/*unsigned long Object::AddObserver(const EventObject & event, Command *cmd)
+	unsigned long Object::AddObserver(const EventObject & event, Command *cmd)
 	{
 		if (!this->m_SubjectImplementation)
 		{
@@ -420,16 +389,16 @@ namespace yltk{
 			return this->m_SubjectImplementation->PrintObservers(os, indent);
 		}
 		return false;
-	}*/
+	}
 
 	/**
 	* Create an object with Debug turned off and modified time initialized 
 	* to the most recently modified object.
 	*/
 	Object::Object():LightObject(),
-		m_Debug(false)//,
-		//m_SubjectImplementation(NULL),
-		//m_MetaDataDictionary(NULL)
+		m_Debug(false),
+		m_SubjectImplementation(NULL),
+		m_MetaDataDictionary(NULL)
 	{
 		this->Modified();
 	}
@@ -438,8 +407,8 @@ namespace yltk{
 	Object::~Object() 
 	{
 		yltkDebugMacro(<< "Destructing!");
-		//delete m_SubjectImplementation;
-		//delete m_MetaDataDictionary;//Deleting a NULL pointer does nothing.
+		delete m_SubjectImplementation;
+		delete m_MetaDataDictionary;//Deleting a NULL pointer does nothing.
 	}
 
 
@@ -454,13 +423,13 @@ namespace yltk{
 		os << indent << "Modified Time: " << this->GetMTime() << std::endl;
 		os << indent << "Debug: " << (m_Debug ? "On\n" : "Off\n");
 		os << indent << "Observers: \n";
-	/*	if(!this->PrintObservers(os, indent.GetNextIndent()))
+		if(!this->PrintObservers(os, indent.GetNextIndent()))
 		{
 			os << indent.GetNextIndent() << "none\n";
-		} */
+		} 
 	}
 
-	/*MetaDataDictionary &Object::GetMetaDataDictionary(void)
+	MetaDataDictionary &Object::GetMetaDataDictionary(void)
 	{
 		if(m_MetaDataDictionary==NULL)
 		{
@@ -485,6 +454,6 @@ namespace yltk{
 			m_MetaDataDictionary=new MetaDataDictionary;
 		}
 		*m_MetaDataDictionary=rhs;
-	}*/
+	}
 
 }
