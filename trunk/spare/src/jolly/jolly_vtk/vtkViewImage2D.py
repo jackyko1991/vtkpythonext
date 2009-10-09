@@ -10,6 +10,7 @@ from vtkViewImage import *
 from vtkInteractorStyleImage2D import *
 from vtkViewImage2DCommand import *
 
+
 class vtkViewImage2D(vtkViewImage):
     
     # InteractionStyleIds
@@ -98,18 +99,18 @@ class vtkViewImage2D(vtkViewImage):
         mapper.SetInputConnection(self.HorizontalLineSource.GetOutputPort())
         self.HorizontalLineActor.SetMapper(mapper)
         self.HorizontalLineActor.GetProperty().SetColor(1.0, 0.0, 0.0)
-        del mapper
+        #del mapper
         self.HorizontalLineActor.SetVisibility(0)
         
         mapper2 = vtk.vtkPolyDataMapper()
         mapper2.SetInputConnection(self.VerticalLineSource.GetOutputPort())
         self.VerticalLineActor.SetMapper(mapper2)
         self.VerticalLineActor.GetProperty().SetColor(1.0, 0.0, 0.0)
-        del mapper2
+        #del mapper2
         self.VerticalLineActor.SetVisibility(0)
         
         self.CornerAnnotation.SetWindowLevel(self.WindowLevelForCorner)
-        self.Orientation = vtkViewImage.AXIAL_ID
+        self.SetOrientation(vtkViewImage.AXIAL_ID)
         
         if self.GetViewImage2DDisplayConventions() == 0:
             self.SetConventionsToRadiological()
@@ -150,6 +151,10 @@ class vtkViewImage2D(vtkViewImage):
     def UpdateImageActor(self):
         if not self.Image:
             return
+        print self.ImageReslice.GetOutput()
+        print self.AuxInput
+        print self.WindowLevel.GetInput()
+        
         self.ImageReslice.GetOutput().UpdateInformation()
         self.ImageActor.GetInput().SetUpdateExtent(self.ImageReslice.GetOutput().GetWholeExtent())
         self.ImageActor.SetDisplayExtent(self.ImageReslice.GetOutput().GetWholeExtent())
@@ -416,7 +421,7 @@ class vtkViewImage2D(vtkViewImage):
         if self.LookupTable:
             self.LookupTable.SetRange((v_min-0.5*self.Shift)/self.Scale,
                                       (v_max-1.5*self.Shift)/self.Scale)
-            self.WindowLevel.GetLookupTable.SetRange(v_min, v_max)
+            self.WindowLevel.GetLookupTable().SetRange(v_min, v_max)
     
     def SetLevel(self, l):
         shiftScaleLevel = self.Shift + l*self.Scale
@@ -427,7 +432,7 @@ class vtkViewImage2D(vtkViewImage):
         if self.LookupTable:
             self.LookupTable.SetRange((v_min-0.5*self.Shift)/self.Scale,
                                       (v_max-1.5*self.Shift)/self.Scale)
-            self.WindowLevel.GetLookupTable.SetRange(v_min, v_max)
+            self.WindowLevel.GetLookupTable().SetRange(v_min, v_max)
     
     def GetColorWindow(self):
         return self.Window
@@ -464,27 +469,30 @@ class vtkViewImage2D(vtkViewImage):
         else:
             self.AuxInput = self.WindowLevel.GetOutput()
             self.WindowLevel.SetInput(image)
-            range = image.GetScalarRange(range)
+            range = image.GetScalarRange()
             if self.WindowLevel.GetLookupTable():
-                self.WidnowLevel.GetLookupTable().SetRange(range)
-        if self.OverlappingImage():
+                self.WindowLevel.GetLookupTable().SetRange(range)
+        if self.OverlappingImage:
             self.Blender.SetInput(0, self.AuxInput)
         else:
             if self.MaskImage:
-                self.MaskFilter.SetImageInput(self.AuxInput)
+                #self.MaskFilter.SetImageInput(self.AuxInput)
+                pass
             else:
                 self.ImageReslice.SetInput(self.AuxInput)
                 self.ResliceInput = self.AuxInput
-        self.ImageActor.SetInput(self.ImageReslice.GetOutput())
         
+        self.ImageActor.SetInput(self.ImageReslice.GetOutput())
+       
         self.AddActor(self.HorizontalLineActor)
+        
         self.AddActor(self.VerticalLineActor)
+        
         self.AddActor(self.ImageActor)
         
         # save the camera focal and position, and zoom, before calling Update (in SetOrientation())
-        focal = [0.0]*3
-        pos = [0.0]*3
-        self.GetCameraFocalAndPosition(focal, pos)
+     
+        pos,focal  = self.GetCameraFocalAndPosition()
         zoom = self.Zoom
         self.SetOrientation(self.Orientation)
         self.SetWindow(self.Window)
@@ -570,18 +578,20 @@ class vtkViewImage2D(vtkViewImage):
             raise RuntimeError, "The number of LUT entries is less than the range of the mask."
         
         if self.OverlappingImage:
-            self.MaskFilter.SetImageInput(self.Blender.GetOutput())
+            #self.MaskFilter.SetImageInput(self.Blender.GetOutput())
+            pass
         else:
-            self.MaskFilter.SetImageInput(self.AuxInput)
-        self.MaskFilter.SetMaskInput(mask)
-        self.MaskFilter.SetLookupTable(lut)
+            #self.MaskFilter.SetImageInput(self.AuxInput)
+            pass
+        #self.MaskFilter.SetMaskInput(mask)
+        #self.MaskFilter.SetLookupTable(lut)
         # ids = vtk.vtkImageDataStreamer()
         # ids.SetInput(self.MaskFilter.GetOutput())
         # ids.SetNumberOfStreamDivisions(40)
         # ids.UpdateWholeExtent()
-        self.MaskFilter.Update
-        self.ImageReslice.SetInputConnection(self.MaskFilter.GetOutputPort())
-        self.ResliceInput = self.MaskFilter.GetOutput()
+        #self.MaskFilter.Update()
+        #self.ImageReslice.SetInputConnection(self.MaskFilter.GetOutputPort())
+        #self.ResliceInput = self.MaskFilter.GetOutput()
         # def ids
     
     def RemoveMaskImage(self):
@@ -602,14 +612,16 @@ class vtkViewImage2D(vtkViewImage):
         self.Blender.AddInput(image)
         
         if self.MaskImage:
-            self.MaskFilter.SetInputConnection(self.Blender.GetOutputPort())
+            #self.MaskFilter.SetInputConnection(self.Blender.GetOutputPort())
+            pass
         else:
             self.ImageReslice.SetInputConnection(self.Blender.GetOutputPort())
             self.ResliceInput = self.Blender.GetOutput()
     
     def RemoveOverlappingImage(self):
         if self.MaskImage:
-            self.MaskFilter.SetInput(self.AuxInput)
+            #self.MaskFilter.SetInput(self.AuxInput)
+            pass
         else:
             self.ImageReslice.SetInput(self.AuxInput)
             self.ResliceInput = self.AuxInput
@@ -791,7 +803,7 @@ class vtkViewImage2D(vtkViewImage):
         self.ResetAndRestablishZoomAndCamera()
     
     def SetupAnnotations(self): 
-        if self.Image:
+        if self.Image == None:
             return
         dims = self.Image.GetDimensions()
         spacing = self.Image.GetSpacing()
@@ -894,11 +906,11 @@ class vtkViewImage2D(vtkViewImage):
         camera.SetFocalPoint(focal[0], focal[1], c_focal[2])
         camera.SetPosition(pos[0], pos[1], c_position[2])
      
-    def GetCameraFocalAndPosition(self, focal, pos):
+    def GetCameraFocalAndPosition(self):
         if not self.Renderer:
             return
         camera = self.Renderer.GetActiveCamera()
-        return camera.GetPosition(), camera.GetFocalPoint(focal)
+        return camera.GetPosition(), camera.GetFocalPoint()
     
     
     def SyncSetCameraFocalAndPosition(self, focal, pos):
@@ -916,9 +928,138 @@ class vtkViewImage2D(vtkViewImage):
                     view.Render()
         
         self.UnLock()
-            
-     
+    
+    def SetLeftButtonInteractionStyle(self, style):
+        self.LeftButtonInteractionStyle = style
+        
+    def SetMiddleButtonInteractionStyle(self, style):
+        self.MiddleButtonInteractionStyle = style 
+    
+    def SetWheelInteractionStyle(self, style):
+        self.WheelInteractionStyle = style
+    
+    def SetRightButtonInteractionStyle(self, style):
+        self.RightButtonInteractionStyle = style
+    
+    
      
         
 if __name__ == "__main__":
-    pass
+    import sys
+    from jolly.ImageSeriesReader import *
+    from vtk.util.misc import vtkGetDataRoot
+    sys.argv.append("C:/head")
+    
+    if len(sys.argv)<2:
+        sys.exit("Usage:\n\t%s <image file>\nExample: \n\t%s [vtkINRIA3D_DATA_DIR]/MRI.vtk\n" 
+                 % (sys.argv[0], sys.argv[0]))
+    
+    #===========================================================================
+    # Create 3 views, each of them will have a different orientation, .i.e.
+    # axial, sagittal and coronal.
+    #===========================================================================
+    view1 = vtkViewImage2D()
+    view2 = vtkViewImage2D()
+    view3 = vtkViewImage2D()
+    
+    iren1 = vtk.vtkRenderWindowInteractor()
+    iren2 = vtk.vtkRenderWindowInteractor()
+    iren3 = vtk.vtkRenderWindowInteractor()
+    
+    rwin1 = vtk.vtkRenderWindow()
+    rwin2 = vtk.vtkRenderWindow()
+    rwin3 = vtk.vtkRenderWindow()
+    
+    renderer1 = vtk.vtkRenderer()
+    renderer2 = vtk.vtkRenderer()
+    renderer3 = vtk.vtkRenderer()
+    
+    iren1.SetRenderWindow(rwin1)
+    iren2.SetRenderWindow(rwin2)
+    iren3.SetRenderWindow(rwin3)
+    
+    rwin1.AddRenderer(renderer1)
+    rwin2.AddRenderer(renderer2)
+    rwin3.AddRenderer(renderer3)
+    
+    view1.SetRenderWindow(rwin1)
+    view2.SetRenderWindow(rwin2)
+    view3.SetRenderWindow(rwin3)
+    
+    view1.SetRenderer(renderer1)
+    view2.SetRenderer(renderer2)
+    view3.SetRenderer(renderer3)
+    
+    # One can also associate to each button (left, middle, right and even wheel)
+    # a specific interaction like this:
+    
+    view1.SetLeftButtonInteractionStyle(vtkViewImage2D.ZOOM_INTERACTION)
+    view1.SetMiddleButtonInteractionStyle(vtkViewImage2D.SELECT_INTERACTION)
+    view1.SetWheelInteractionStyle(vtkViewImage2D.SELECT_INTERACTION)
+    view1.SetRightButtonInteractionStyle(vtkViewImage2D.WINDOW_LEVEL_INTERACTION)
+    
+    view2.SetLeftButtonInteractionStyle(vtkViewImage2D.ZOOM_INTERACTION)
+    view2.SetMiddleButtonInteractionStyle(vtkViewImage2D.SELECT_INTERACTION)
+    view2.SetWheelInteractionStyle(vtkViewImage2D.SELECT_INTERACTION)
+    view2.SetRightButtonInteractionStyle(vtkViewImage2D.WINDOW_LEVEL_INTERACTION)
+    
+    view3.SetLeftButtonInteractionStyle(vtkViewImage2D.ZOOM_INTERACTION)
+    view3.SetMiddleButtonInteractionStyle(vtkViewImage2D.SELECT_INTERACTION)
+    view3.SetWheelInteractionStyle(vtkViewImage2D.SELECT_INTERACTION)
+    view3.SetRightButtonInteractionStyle(vtkViewImage2D.WINDOW_LEVEL_INTERACTION)
+    
+    view1.SetLinkZoom(True)  
+    view2.SetLinkZoom(True)
+    view3.SetLinkZoom(True)
+    
+    view1.SetOrientation(vtkViewImage2D.AXIAL_ID)
+    view2.SetOrientation(vtkViewImage2D.CORONAL_ID)
+    view3.SetOrientation(vtkViewImage2D.SAGITTAL_ID)
+    
+    view1.SetBackgroundColor(0.0, 0.0, 0.0)
+    view2.SetBackgroundColor(0.0, 0.0, 0.0)
+    view3.SetBackgroundColor(0.0, 0.0, 0.0)
+    
+    view1.SetAboutData("Powered by summit & jolly")
+    view2.SetAboutData("Powered by summit & jolly")
+    view3.SetAboutData("Powered by summit & jolly")
+    
+    # Link the views together for synchronization.
+    view1.AddChild(view2)
+    view2.AddChild(view3)
+    view3.AddChild(view1)
+    
+    reader = ImageSeriesReader(sys.argv[1])
+    v16 = vtk.vtkVolume16Reader()
+    v16.SetDataDimensions(64, 64)
+    v16.SetDataByteOrderToLittleEndian()
+    v16.SetFilePrefix(os.path.join(vtkGetDataRoot(),
+                                   "Data", "headsq", "quarter"))
+    v16.SetImageRange(1, 93)
+    v16.SetDataSpacing(3.2, 3.2, 1.5)
+    v16.Update()
+    
+    image = v16.GetOutput()
+    
+    WindowLevel = vtk.vtkImageMapToColors()
+    WindowLevel.SetInput(image)
+    WindowLevel.Update()
+    print WindowLevel.GetOutput()
+    view1.SetImage(image)
+    view2.SetImage(image)
+    view3.SetImage(image)
+    
+    #  Reset the window/level and the current position.
+    view1.SyncResetCurrentPoint()
+    view1.SyncResetWindowLevel()
+    
+    rwin1.Render()
+    rwin2.Render()
+    rwin3.Render()
+    
+    iren1.Start()
+    
+    view1.Detach()
+    view2.Detach()
+    view3.Detach()
+    
