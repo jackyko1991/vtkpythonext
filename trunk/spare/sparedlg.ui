@@ -1,0 +1,187 @@
+<ui version="4.0" >
+ <class>spareDialog</class>
+ <widget class="QDialog" name="spareDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>647</width>
+    <height>539</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>请导入你的系列图像</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3" >
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'宋体'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600; color:#ff0000;">1.请在左边的树型框中选择系列图像所在的位置&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#ff0000;">2.请在右边的文件列表框中对文件名进行重命名，&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#ff0000;">  排序[当然重命名和排序并不是必须的]&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#ff0000;">3.在文件列表框中选择文件，在右上角可以查看预览&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#ff0000;">  ，在对话框下方展开可以查看相关的头文件信息&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; color:#ff0000;">4.确认无误后，点击导入。&lt;/p>&lt;/body>&lt;/html></string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDockWidget" name="dockWidget" >
+       <property name="toolTip" >
+        <string/>
+       </property>
+       <widget class="QWidget" name="dockWidgetContents" >
+        <layout class="QVBoxLayout" name="verticalLayout_3" >
+         <item>
+          <widget class="QWidget" native="1" name="widget" />
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4" >
+     <item>
+      <widget class="QSplitter" name="splitter" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <widget class="QListWidget" name="listWidget_2" />
+       <widget class="QListWidget" name="listWidget" />
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout" >
+       <item>
+        <widget class="QPushButton" name="sortButton" >
+         <property name="text" >
+          <string>排序(&amp;S)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="upButton" >
+         <property name="text" >
+          <string>上移(&amp;U)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="downButton" >
+         <property name="text" >
+          <string>下移(&amp;D)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="renameButton" >
+         <property name="text" >
+          <string>重命名(&amp;R)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="backButton" >
+         <property name="text" >
+          <string>重置(&amp;B)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5" >
+     <item>
+      <widget class="QToolButton" name="toolButton" >
+       <property name="text" >
+        <string>图像信息>>></string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox" >
+       <property name="standardButtons" >
+        <set>QDialogButtonBox::NoButton</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame" >
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow" >
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_6" >
+      <item>
+       <widget class="QTableWidget" name="tableWidget" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+  <zorder>buttonBox</zorder>
+  <zorder>Thermo</zorder>
+  <zorder>ScaleWidget</zorder>
+  <zorder>TextLabel</zorder>
+  <zorder>Wheel</zorder>
+  <zorder>mplwidget</zorder>
+  <zorder>mplwidget_2</zorder>
+  <zorder>xformrendererex</zorder>
+  <zorder>pathdeformrendererex</zorder>
+  <zorder>compositionrenderer</zorder>
+  <zorder>worldTimeClock</zorder>
+  <zorder>tictactoe</zorder>
+  <zorder>analogClock</zorder>
+  <zorder>multipagewidget</zorder>
+  <zorder>webView</zorder>
+  <zorder>graphicsView</zorder>
+  <zorder>dockWidget</zorder>
+  <zorder>listWidget</zorder>
+  <zorder>listWidget_2</zorder>
+  <zorder>graphicsView</zorder>
+  <zorder>label</zorder>
+  <zorder>sortButton</zorder>
+  <zorder>upButton</zorder>
+  <zorder>downButton</zorder>
+  <zorder>renameButton</zorder>
+  <zorder>backButton</zorder>
+  <zorder>commandLinkButton</zorder>
+  <zorder>toolButton</zorder>
+  <zorder>checkBox</zorder>
+  <zorder>radioButton</zorder>
+  <zorder>toolButton</zorder>
+  <zorder>frame</zorder>
+  <zorder>horizontalSpacer</zorder>
+  <zorder>buttonBox</zorder>
+  <zorder>buttonBox</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
