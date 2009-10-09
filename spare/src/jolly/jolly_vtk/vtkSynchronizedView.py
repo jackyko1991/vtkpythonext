@@ -6,7 +6,7 @@ Created on 2009-10-5
 """
 import vtk
 import math
-from QVTKRenderWindowInteractor import *
+from vtk.qt4.QVTKRenderWindowInteractor import *
 
 class vtkSynchronizedView(vtk.vtkObject):
     def __init__(self):
@@ -94,8 +94,8 @@ class vtkSynchronizedView(vtk.vtkObject):
     def SetInteractorStyle(self, style):
         if self.InteractorStyle == style:
             return
-        if self.InteractorStyle:
-            self.InteractorStyle.UnRegister(self)
+        #if self.InteractorStyle:
+        #    self.InteractorStyle.UnRegister(self)
         self.InteractorStyle = style
         if self.InteractorStyle:
             self.InteractorStyle.Register(self)
@@ -271,6 +271,33 @@ class vtkSynchronizedView(vtk.vtkObject):
     def SetAboutData(self, about):
         self.AboutData = about
         self.SetDownLeftAnnotation(self.AboutData)
+    
+    def GetAboutData(self):
+        return self.AboutData
+    
+    def SetNorthAnnotation(self, p_annotation):
+        self.northAnnotation = p_annotation
+        self.UpdateAnnotations()
+    def GetNorthAnnotation(self):
+        return self.northAnnotation 
+    def SetSouthAnnotation(self, p_annotation):
+        self.southAnnotation = p_annotation
+        self.UpdateAnnotations()
+    def GetSouthAnnotation(self):
+        return self.southAnnotation 
+    def SetEastAnnotation(self, p_annotation):
+        self.eastAnnotation = p_annotation
+        self.UpdateAnnotations()
+    def GetEastAnnotation(self):
+        return self.eastAnnotation
+    def SetWestAnnotation(self, p_annotation):
+        self.ouestAnnotation = p_annotation
+        self.UpdateAnnotations()
+    def GetWestAnnotation(self):
+        return self.ouestAnnotation
+    def GetRenderWindow(self):
+        return self.RenderWindow
+               
 
 def vtkrint(a):
     test = math.fabs(a-float(int(a)))

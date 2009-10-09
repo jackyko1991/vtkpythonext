@@ -1,20 +1,22 @@
 # -*- coding:utf-8 -*-
 """
-Created on 2009-10-5
+Created on 2009-9-16
 
 @author: summit
 """
 from Utility import *
+import os
 
-
-class ImageReader:
-    
-    def __init__(self, filename):
-        self.filename = filename
+class ImageSeriesReader:
+    def __init__(self, dir):
+        self.dir = dir
     
     def GetImageProperties(self):
+        
+        thefiles = [os.path.join(self.dir,f) for f in os.listdir(self.dir) if os.path.isfile(os.path.join(self.dir,f)) and (os.path.splitext(f)[1]==".dcm" or os.path.splitext(f)[1]=="")]
+        
         testReader = itk.ImageFileReader.IUS3.New()
-        testReader.SetFileName(self.filename)
+        testReader.SetFileName(thefiles[0])
         
         try:
             testReader.GenerateOutputInformation()
@@ -44,11 +46,18 @@ class ImageReader:
             
         return  dimension, componenttype, dimension, numberofcomponents, \
                 imagesize, imagespacing, imageoffset
-                
-    def Read(self):
+    
+    def Read(self, ext):
         imageinfo = self.GetImageProperties()
-        reader = itk.ImageFileReader[itk.Image[itkpixeltype[imageinfo[1]], 2]].\
-                New(FileName=self.filename)
+        #thefiles = [os.path.join(self.dir,f) for f in os.listdir(self.dir) if os.path.isfile(os.path.join(self.dir,f)) and os.path.splitext(f)[1]==ext ]
+        reader = itk.ImageSeriesReader[itk.Image[itkpixeltype[imageinfo[1]], 3]].\
+                New()
+        
+        nameGenerator = itk.GDCMSeriesFileNames.New()
+        nameGenerator.SetDirectory(self.dir)
+        filenames  = nameGenerator.GetInputFileNames()
+        print filenames
+        reader.SetFileNames(filenames)
      
         try:
             reader.Update()
@@ -63,28 +72,26 @@ class ImageReader:
         converter.Update()
         return converter.GetOutput()
     
-    def ReadToVTK(self):
+    def ReadToVTK(self, ext):
         imageinfo = self.GetImageProperties()
-        reader = itk.ImageFileReader[itk.Image[itkpixeltype[imageinfo[1]], 2]].\
-                New(FileName=self.filename)
+        reader = itk.ImageSeriesReader[itk.Image[itkpixeltype[imageinfo[1]], 3]].\
+                New()
+        
+        nameGenerator = itk.GDCMSeriesFileNames.New()
+        nameGenerator.SetDirectory(self.dir)
+        filenames  = nameGenerator.GetInputFileNames()
+        print filenames
+        reader.SetFileNames(filenames)
+     
+        try:
+            reader.Update()
+        except RuntimeError, e:
+            print e
+            return False
         self.Image = reader.GetOutput()
         converter = itk.ImageToVTKImageFilter[self.Image].New(reader)
         converter.Update()
         return converter.GetOutput()
-
-
+    
 if __name__ == "__main__":
-        reader = ImageReader("../data/open.jpg")
-        if reader.Read():
-            print reader.Image
-        reader = ImageReader("../data/MR")
-        if reader.Read():
-            print reader.Image
-        reader = ImageReader("../data/CT")
-        if reader.Read():
-            print reader.Image
-        print reader.ReadToVTK()
-        
-        
-    
-    
+    print ImageSeriesReader("../data/head").Read('.dcm')

@@ -674,6 +674,18 @@ class vtkViewImage(vtkSynchronizedView):
     def RemoveMaskImage(self):
         pass
     
+    def SetLinkZoom(self, value):
+        self.LinkZoom = value
+    
+    def GetCurrentPoint(self):
+        return self.CurrentPoint
+    
+    def SetSizeData(self, str):
+        self.SizeData = str
+    
+    def GetSizeData(self):
+        return self.SizeData
+        
     
 if __name__ == "__main__":
     print [1,2,3][3]
