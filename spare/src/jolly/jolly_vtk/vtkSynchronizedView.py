@@ -244,7 +244,11 @@ class vtkSynchronizedView(vtk.vtkObject):
             self.AddChild(child)
     
     def RemoveChild(self, view):
-        self.Children.remove(view)
+        try:
+            self.Children.remove(view)
+        except ValueError, e:
+            print "RemoveChild: view not in the list"
+            pass
         # view.UnRegister(self)
         
     def RemoveAllChildren(self):

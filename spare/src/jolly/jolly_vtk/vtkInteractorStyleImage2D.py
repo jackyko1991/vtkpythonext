@@ -468,10 +468,29 @@ class vtkInteractorStyleImage2D(vtk.vtkInteractorStyleImage):
             self.EndDolly()
         else:
             pass
+    
+    def GetWindowStep(self):
+        return self.WindowStep
+    
+    def SetWindowStep(self, step):
+        self.WindowStep = step
+    
+    def GetLevelStep(self):
+        return self.LevelStep
+    
+    def SetLevelStep(self, step):
+        self.LevelStep = step
+        
+    def GetZSliceStep(self):
+        return self.ZSliceStep
+    
+    def SetZSliceStep(self, step):
+        self.ZSliceStep = step
         
         
         
 if __name__ == "__main__":
     x = vtkInteractorStyleImage2D()
+    
     x.WindowLevelCurrentPosition = [1.0,2.0]
     print x.WindowLevelStartPosition

@@ -546,15 +546,15 @@ class vtkViewImage(vtkSynchronizedView):
     
     def SetWindow(self, window):
         self.Window = window
-        self.InvokeEvent(self.ViewImageWindowLevelChangeEvent)
+        self.InvokeEvent("ViewImageWindowLevelChangeEvent")
         
     def SetLevel(self, level):
         self.Level = level
-        self.InvokeEvent(self.ViewImageWindowLevelChangeEvent)
+        self.InvokeEvent("ViewImageWindowLevelChangeEvent")
         
     def SetZoom(self, zoom):
         self.Zoom = zoom
-        self.InvokeEvent(self.ViewImageZoomChangeEvent)
+        self.InvokeEvent("ViewImageZoomChangeEvent")
         
     def SetLookupTable(self, lut):
         self.LookupTable = lut
@@ -563,7 +563,7 @@ class vtkViewImage(vtkSynchronizedView):
     def SetCurrentPoint(self, pos):
         self.CurrentPoint = pos
         self.UpdatePosition()
-        self.InvokeEvent(self.ViewImagePositionChangeEvent)
+        self.InvokeEvent("ViewImagePositionChangeEvent")
     
     def SyncSetPosition(self, p_point): 
         self.SyncSetCurrentPoint(p_point)
