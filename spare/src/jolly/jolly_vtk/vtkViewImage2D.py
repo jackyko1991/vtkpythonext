@@ -203,44 +203,44 @@ class vtkViewImage2D(vtkViewImage):
         interactor.SetView(self)
         cbk = vtkViewImage2DCommand()
         cbk.SetView(self)
-        #self.SetInteractorStyle(interactor)
-        if self.RenderWindowInteractor<>None:
-            self.RenderWindowInteractor.AddObserver("KeyPressEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "KeyPressEvent"))
-            self.RenderWindowInteractor.AddObserver("WindowLevelEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "WindowLevelEvent"))
-            self.RenderWindowInteractor.AddObserver("StartWindowLevelEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "StartWindowLevelEvent"))
-            self.RenderWindowInteractor.AddObserver("ResetWindowLevelEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "ResetWindowLevelEvent"))
-            self.RenderWindowInteractor.AddObserver("EndWindowLevelEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "EndWindowLevelEvent"))
-            self.RenderWindowInteractor.AddObserver("PickEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "PickEvent"))
-            self.RenderWindowInteractor.AddObserver("StartPickEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "StartPickEvent"))
-            self.RenderWindowInteractor.AddObserver("EndPickEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "EndPickEvent"))
-            self.RenderWindowInteractor.AddObserver("ResetZoomEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "ResetZoomEvent"))
-            self.RenderWindowInteractor.AddObserver("ResetPositionEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "ResetPositionEvent"))
-            self.RenderWindowInteractor.AddObserver("StartZSliceMoveEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "StartZSliceMoveEvent"))
-            self.RenderWindowInteractor.AddObserver("ZSliceMoveEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "ZSliceMoveEvent"))
-            self.RenderWindowInteractor.AddObserver("EndZSliceMoveEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "EndZSliceMoveEvent"))
-            self.RenderWindowInteractor.AddObserver("StartMeasureEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "StartMeasureEvent"))
-            self.RenderWindowInteractor.AddObserver("MeasureEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "MeasureEvent"))
-            self.RenderWindowInteractor.AddObserver("EndMeasureEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "EndMeasureEvent"))
-            self.RenderWindowInteractor.AddObserver("FullPageEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "FullPageEvent"))
-            self.RenderWindowInteractor.AddObserver("ZoomEvent", 
-                                   lambda obj, event: cbk.Execute(obj, "ZoomEvent"))
+        self.SetInteractorStyle(interactor)
+        interactor.HandleObserversOff()
+        interactor.AddObserver("KeyPressEvent", 
+                               lambda obj, event: cbk.Execute(obj, "KeyPressEvent"))
+        interactor.AddObserver("WindowLevelEvent", 
+                               lambda obj, event: cbk.Execute(obj, "WindowLevelEvent"))
+        interactor.AddObserver("StartWindowLevelEvent", 
+                               lambda obj, event: cbk.Execute(obj, "StartWindowLevelEvent"))
+        interactor.AddObserver("ResetWindowLevelEvent", 
+                               lambda obj, event: cbk.Execute(obj, "ResetWindowLevelEvent"))
+        interactor.AddObserver("EndWindowLevelEvent", 
+                               lambda obj, event: cbk.Execute(obj, "EndWindowLevelEvent"))
+        interactor.AddObserver("PickEvent", 
+                               lambda obj, event: cbk.Execute(obj, "PickEvent"))
+        interactor.AddObserver("StartPickEvent", 
+                               lambda obj, event: cbk.Execute(obj, "StartPickEvent"))
+        interactor.AddObserver("EndPickEvent", 
+                               lambda obj, event: cbk.Execute(obj, "EndPickEvent"))
+        interactor.AddObserver("ResetZoomEvent", 
+                               lambda obj, event: cbk.Execute(obj, "ResetZoomEvent"))
+        interactor.AddObserver("ResetPositionEvent", 
+                               lambda obj, event: cbk.Execute(obj, "ResetPositionEvent"))
+        interactor.AddObserver("StartZSliceMoveEvent", 
+                               lambda obj, event: cbk.Execute(obj, "StartZSliceMoveEvent"))
+        interactor.AddObserver("ZSliceMoveEvent", 
+                               lambda obj, event: cbk.Execute(obj, "ZSliceMoveEvent"))
+        interactor.AddObserver("EndZSliceMoveEvent", 
+                               lambda obj, event: cbk.Execute(obj, "EndZSliceMoveEvent"))
+        interactor.AddObserver("StartMeasureEvent", 
+                               lambda obj, event: cbk.Execute(obj, "StartMeasureEvent"))
+        interactor.AddObserver("MeasureEvent", 
+                               lambda obj, event: cbk.Execute(obj, "MeasureEvent"))
+        interactor.AddObserver("EndMeasureEvent", 
+                               lambda obj, event: cbk.Execute(obj, "EndMeasureEvent"))
+        interactor.AddObserver("FullPageEvent", 
+                               lambda obj, event: cbk.Execute(obj, "FullPageEvent"))
+        interactor.AddObserver("ZoomEvent", 
+                               lambda obj, event: cbk.Execute(obj, "ZoomEvent"))
         
         
     def SetShowDirections(self, p_showDirections):
@@ -930,7 +930,7 @@ class vtkViewImage2D(vtkViewImage):
                     view.Render()
         
         self.UnLock()
-<<<<<<< .mine
+
     
     def SetLeftButtonInteractionStyle(self, style):
         self.LeftButtonInteractionStyle = style
@@ -951,7 +951,7 @@ class vtkViewImage2D(vtkViewImage):
         return self.Conventions
     
     
-=======
+
     
     def SetLeftButtonInteractionStyle(self, style):
         self.LeftButtonInteractionStyle = style
@@ -966,11 +966,11 @@ class vtkViewImage2D(vtkViewImage):
         self.RightButtonInteractionStyle = style
     
     
->>>>>>> .r28
+
      
         
 if __name__ == "__main__":
-<<<<<<< .mine
+
     import sys
     from jolly.ImageSeriesReader import *
     from vtk.util.misc import vtkGetDataRoot
@@ -1097,7 +1097,7 @@ if __name__ == "__main__":
     view1.Detach()
     view2.Detach()
     view3.Detach()
-    =======
+
     import sys
     from jolly.ImageSeriesReader import *
     from vtk.util.misc import vtkGetDataRoot
@@ -1215,4 +1215,4 @@ if __name__ == "__main__":
     view1.Detach()
     view2.Detach()
     view3.Detach()
-    >>>>>>> .r28
+

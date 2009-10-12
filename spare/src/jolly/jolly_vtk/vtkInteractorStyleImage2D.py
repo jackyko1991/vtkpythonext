@@ -21,6 +21,8 @@ class vtkInteractorStyleImage2D(vtk.vtkInteractorStyleImage):
     
     def __init__(self):
         
+        
+        
         self.View = None
         self.ZSliceStep = 0
         self.LevelStep = 0.0
