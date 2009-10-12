@@ -200,34 +200,35 @@ class vtkPythonInteractorObserver(vtk.vtkObject):
     #  Convenience methods for outside classes. Make sure that the
     #  parameter "ren" is not-null.
     #==========================================================================
-    def ComputeDisplayToWorld(self, ren, x, y, z):
-        worldPt = [0.0]*4
+    def ComputeDisplayToWorld1(self, ren, x, y, z, worldPt):
         ren.SetDisplayPoint(x,y,z)
-        ren.DisplayToWorld(worldPt)
-        ren.GetWorldPoint(worldPt)
+        ren.DisplayToWorld()
+        worldPt=list(ren.GetWorldPoint())
         if worldPt[3]:
             worldPt[0] /= worldPt[3]
             worldPt[1] /= worldPt[3]
             worldPt[2] /= worldPt[3]
             worldPt[3] = 1.0
         return worldPt
+        
     
-    def ComputeDisplayToWorld(self, x, y, z):
+    def ComputeDisplayToWorld(self, x, y, z, worldPt):
         if self.CurrentRenderer <> None:
-            return self.ComputeDisplayToWorld(self.CurrentRenderer, x, y, z)
-        return [0.0]*4
+            return self.ComputeDisplayToWorld1(self.CurrentRenderer, x, y, z, worldPt)
+        return worldPt
     
-    def ComputeWorldToDisplay(self, ren , x, y, z):
-        displayPt = [0.0]*3
+    def ComputeWorldToDisplay1(self, ren , x, y, z, displayPt):
+        
         ren.SetWorldPoint(x, y, z, 1.0)
         ren.WorldToDisplay()
         ren.GetDisplayPoint(displayPt)
         return displayPt
+        
     
-    def ComputeWorldToDisplay(self, x, y, z):
+    def ComputeWorldToDisplay(self, x, y, z, displayPt):
         if self.CurrentRenderer <> None:
-            return self.ComputeDisplayToWorld(self.CurrentRenderer, x, y, z)
-        return [0.0]*3
+            return self.ComputeDisplayToWorld1(self.CurrentRenderer, x, y, z, displayPt)
+        return displayPt
     
     #===========================================================================
     # Description:
@@ -241,10 +242,13 @@ class vtkPythonInteractorObserver(vtk.vtkObject):
     #   mouse events.)
     #===========================================================================
     def GrabFocus(self, mouseEvents, keypressEvents=None):
+#        if self.Interactor:
+#            self.Interactor.GrabFocus(mouseEvents, keypressEvents)
         pass
     def ReleaseFocus(self):
-        pass
-    
+#        if self.Interactor:
+#            self.Interactor.ReleaseFocus()
+        pass    
     #===========================================================================
     # Description:
     #   Utility routines used to start and end interaction.
