@@ -669,10 +669,10 @@ class vtkPythonInteractorStyle(vtkPythonInteractorObserver):
     #  mouse wheel motion.
     #===========================================================================
     def SetMouseWheelMotionFactor(self, MouseWheelMotionFactor):
-        pass
+        self.MouseWheelMotionFactor = MouseWheelMotionFactor
     
     def GetMouseWheelMotionFactor(self):
-        pass
+        return self.MouseWheelMotionFactor
     
     #===========================================================================
     # Description:

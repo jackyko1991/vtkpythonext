@@ -159,20 +159,20 @@ class vtkViewImage2DCommand:
             conventions = self.View.GetConventions()
             
             if orientation == vtkViewImage2D.SAGITTAL_ID:
-                pos[1] = world[0]
-                pos[2] = world[1]
+                pos[1] = world[0]  # *1.0
+                pos[2] = world[1]  # *1.0
             elif orientation == vtkViewImage2D.CORONAL_ID:
                 if conventions == vtkViewImage2D.RADIOLOGIC:
-                    pos[0] = world[0]
+                    pos[0] = world[0] # *-1.0
                 else:
-                    pos[0] = world[0] - 1.0
+                    pos[0] = world[0]*- 1.0
                 pos[2] = world[1]
             elif orientation == vtkViewImage2D.AXIAL_ID:
                 if conventions == vtkViewImage2D.RADIOLOGIC:
                     pos[0] = world[0]
                 else:
-                    pos[0] = world[0] - 1.0
-                pos[1] = world[1] - 1.0
+                    pos[0] = world[0]*- 1.0
+                pos[1] = world[1]*-1.0
             
             # Treat extrem positions
             
@@ -196,8 +196,8 @@ class vtkViewImage2DCommand:
         p_nbSlices = p_isi.GetZSliceStep()
         current_slice = self.View.GetZSlice()
         dest_slice = current_slice + p_nbSlices
-        
         pos = self.View.GetPositionForSlice(dest_slice, self.View.GetOrientation())
+        print pos
         self.View.SyncSetPosition(pos)
         
         self.View.Render()
