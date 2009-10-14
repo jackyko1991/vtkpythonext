@@ -288,9 +288,7 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         
         actor.SetUserTransform(self.__AdjustmentTransform)
         self.GetRenderer().AddViewProp(actor)
-        del cutter
-        del mapper
-        del actor
+
         self.getDataSetCollection().AddItem(dataset)
         self.getProp3DCollection().AddItem(actor)
         
@@ -416,6 +414,7 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
             x[self.GetSliceOrientation()] = bounds[2*self.GetSliceOrientation()]
             oldpoints.InsertPoint(i, x)
         self.getOrientationTransform().TransformPoints(oldpoints, points)
+       
         self.__SlicePlane.SetPoints(points)
         del oldpoints
         del points
@@ -461,22 +460,23 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
 #         We should allow more colors...
         vals = [0.0]*3
         vals[self.__ViewOrientation] = 255
-        array = vtk.vtkUnsignedCharArray()
+        array = self.__SlicePlane.GetPointData().GetScalars()
+       
         if not array:
             return
-        array.InsertComponent(0,0,255)
-        array.InsertComponent(0,1,0)
-        array.InsertComponent(0,2,0)
-        array.InsertComponent(1,0,255)
-        array.InsertComponent(1,1,0)
-        array.InsertComponent(1,2,0)
-        array.InsertComponent(2,0,255)
-        array.InsertComponent(2,1,0)
-        array.InsertComponent(2,2,0)
-        array.InsertComponent(3,0,255)
-        array.InsertComponent(3,1,0)
-        array.InsertComponent(3,2,0)
-
+        array.InsertComponent(0,0,vals[0])
+        array.InsertComponent(0,1,vals[1])
+        array.InsertComponent(0,2,vals[2])
+        array.InsertComponent(1,0,vals[0])
+        array.InsertComponent(1,1,vals[1])
+        array.InsertComponent(1,2,vals[2])
+        array.InsertComponent(2,0,vals[0])
+        array.InsertComponent(2,1,vals[1])
+        array.InsertComponent(2,2,vals[2])
+        array.InsertComponent(3,0,vals[0])
+        array.InsertComponent(3,1,vals[1])
+        array.InsertComponent(3,2,vals[2])
+       
             
     def SetCameraFromOrientation(self):
         '''
@@ -707,35 +707,36 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         '''
         @return: None
         '''
+        self.__SlicePlane.SetPolys(vtk.vtkCellArray())
         points = vtk.vtkPoints()
         self.__SlicePlane.SetPoints(points)
         points.InsertNextPoint(0, 0, 0)
         points.InsertNextPoint(1, 0, 0)
         points.InsertNextPoint(0, 1, 0)
         points.InsertNextPoint(1, 1, 0)
-        self.__SlicePlane.Allocate(4,4)
+        
         
         pts = vtk.vtkIdList()
-        pts.InsertId(0, 0)
-        pts.InsertId(1, 1)
-        pts.InsertId(2, 2)
-        self.__SlicePlane.InsertNextCell(vtk.VTK_TRIANGLE, pts)
-        pts = vtk.vtkIdList()
-        pts.InsertId(1, 1)
-        pts.InsertId(2, 2) #???
-        pts.InsertId(2, 3)
-        self.__SlicePlane.InsertNextCell(vtk.VTK_TRIANGLE, pts)
-        pts = vtk.vtkIdList()
-        pts.InsertId(0, 1)
-        pts.InsertId(1, 1) #???
-        pts.InsertId(2, 3)
-        self.__SlicePlane.InsertNextCell(vtk.VTK_TRIANGLE, pts)
-        pts = vtk.vtkIdList()
-        pts.InsertId(0, 0)
-        pts.InsertId(1, 2) #???
-        pts.InsertId(2, 3)
-        self.__SlicePlane.InsertNextCell(vtk.VTK_TRIANGLE, pts)
-        del points
+        pts.InsertNextId(0)
+        pts.InsertNextId(1)
+        pts.InsertNextId(2)
+        self.__SlicePlane.InsertNextCell(vtk.VTK_POLYGON,  pts)
+        pts.Reset()
+        pts.InsertNextId(1)
+        pts.InsertNextId(2) #???
+        pts.InsertNextId(3)
+        self.__SlicePlane.InsertNextCell(vtk.VTK_POLYGON,  pts)
+        pts.Reset()
+        pts.InsertNextId(0)
+        pts.InsertNextId(1) #???
+        pts.InsertNextId(3)
+        self.__SlicePlane.InsertNextCell(vtk.VTK_POLYGON,  pts)
+        pts.Reset()
+        pts.InsertNextId(0)
+        pts.InsertNextId(2) #???
+        pts.InsertNextId(3)
+        self.__SlicePlane.InsertNextCell(vtk.VTK_POLYGON,  pts)
+        #del points
         
         array = vtk.vtkUnsignedCharArray()
         array.SetName("Colors")
@@ -755,7 +756,7 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
 
         self.__SlicePlane.GetPointData().SetScalars(array)
         
-        del array
+        #del array
         
     def InstallPipeline(self):
         '''
@@ -765,20 +766,21 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
             self.GetRenderWindow().AddRenderer(self.GetRenderer())
         if self.GetInteractor():
             if self.getInteractorStyleType() == self.INTERACTOR_STYLE_NAVIGATION:
-                
-                self.__InteractorStyleSwitcher = vtkPythonInteractorStyleImage2D()
-                self.GetInteractor().SetInteractorStyle(None)
-                self.__InteractorStyleSwitcher.SetPriority(1.0)
-                
-                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
-                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
-                
-                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
-                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
-                self.__InteractorStyleSwitcher.AddObserver("StartWindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"StartWindowLevelEvent", self.__InteractorStyleSwitcher))
-                self.__InteractorStyleSwitcher.AddObserver("WindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"WindowLevelEvent", self.__InteractorStyleSwitcher))
-                self.__InteractorStyleSwitcher.AddObserver("CharEvent", lambda obj,event:self.__Command.Execute(obj,"CharEvent", self.__InteractorStyleSwitcher))
-                self.__InteractorStyleSwitcher.AddObserver("ResetWindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"ResetWindowLevelEvent", self.__InteractorStyleSwitcher))
+                if (not self.__InteractorStyleSwitcher or 
+                    not isinstance(self.__InteractorStyleSwitcher, vtkPythonViewImage2D)):
+                    self.__InteractorStyleSwitcher = vtkPythonInteractorStyleImage2D()
+                    self.GetInteractor().SetInteractorStyle(None)
+                    self.__InteractorStyleSwitcher.SetPriority(1.0)
+                    
+                    self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                    self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                    
+                    self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                    self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                    self.__InteractorStyleSwitcher.AddObserver("StartWindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"StartWindowLevelEvent", self.__InteractorStyleSwitcher))
+                    self.__InteractorStyleSwitcher.AddObserver("WindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"WindowLevelEvent", self.__InteractorStyleSwitcher))
+                    self.__InteractorStyleSwitcher.AddObserver("CharEvent", lambda obj,event:self.__Command.Execute(obj,"CharEvent", self.__InteractorStyleSwitcher))
+                    self.__InteractorStyleSwitcher.AddObserver("ResetWindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"ResetWindowLevelEvent", self.__InteractorStyleSwitcher))
                 
     #                We don't observe the ResetWindowLevelEvent because it is already
     #                included in the ResetViewerEvent.
@@ -886,11 +888,13 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         dot = 0
         if self.getOrientationMatrix():
             for i in range(3):
-                if dot < math.abs(self.getOrientationMatrix().GetElement(orientation, i)):
-                    dot = math.abs(self.getOrientationMatrix().GetElement(orientation, i))
+                if dot < abs(self.getOrientationMatrix().GetElement(orientation, i)):
+                    dot = abs(self.getOrientationMatrix().GetElement(orientation, i))
                     sliceorientation = i
         self.SetSliceOrientation(sliceorientation)
-
+    
+    def getInteractorStyleSwitcher(self):
+        return self.__InteractorStyleSwitcher
 
     def setViewConvention(self, convention):
         '''
