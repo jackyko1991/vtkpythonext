@@ -13,7 +13,7 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
 
    It inherits from the vtkImageViewer2 class, which is initially designed for 2D scene
    visualization. However, vtkViewImage overrides some of its parents' methods (SetSlice())
-   in order to generalize its purpose to 2D AND 3D scene visualization.
+   in order to generalizFe its purpose to 2D AND 3D scene visualization.
 
    As a high-level class, it provides the user with convinient functionalities
    such as a colormap (SetLookupTable()), a scalar bar (ScalarBarActor), some corner annotations
@@ -245,8 +245,8 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
         
         # Get information
         unorientedposition = [position[0], position[1], position[2], 1]
-        spacing = self.GetInput().GetSpacing()+[0.0]
-        origin = self.GetInput().GetOrigin()+[0.0]
+        spacing = list(self.GetInput().GetSpacing())+[0.0]
+        origin = list(self.GetInput().GetOrigin())+[0.0]
         
         #  apply inverted orientation matrix to the world-coordinate position
         inverse = vtk.vtkMatrix4x4()
@@ -254,7 +254,7 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
         inverse.MultiplyPoint(unorientedposition, unorientedposition)
         
         indices = [0]*3
-        for i in range[3]:
+        for i in range(3):
             if math.fabs(spacing[i]) > 1e-5:
                 indices[i] = vtk.vtkMath.Round((unorientedposition[i]-origin[i])/spacing[i])
             else:

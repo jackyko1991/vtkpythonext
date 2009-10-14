@@ -21,7 +21,7 @@ Created on 2009-10-12
  
 """
 
-from jolly.jolly_vtk.vtkPythonInteractorStyleTrackballCamera import *
+from jolly.jolly_vtk2.vtkPythonInteractorStyleTrackballCamera import *
 
 class vtkPythonInteractorStyleImage(vtkPythonInteractorStyleTrackballCamera):
     

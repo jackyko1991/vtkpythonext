@@ -5,6 +5,7 @@ Created on 2009-10-13
 '''
 import vtk
 from jolly.jolly_vtk2.vtkPythonInteractorStyleImage import *
+from jolly.jolly_vtk2.vtkPythonViewImage2DCommand import *
 
 
 class vtkPythonInteractorStyleImage2D(vtkPythonInteractorStyleImage):
@@ -27,38 +28,48 @@ class vtkPythonInteractorStyleImage2D(vtkPythonInteractorStyleImage):
         vtkPythonInteractorStyleImage.__init__(self)
         
         
-        self.SliceStep = 0.0
-        self.RequestedPosition = [0,0]
+        self.__SliceStep = 0.0
+        self.__RequestedPosition = [0,0]
         
         self.__LeftButtonInteraction = self.InteractionTypeWindowLevel
         self.__RightButtonInteraction = self.InteractionTypeZoom
         self.__MiddleButtonInteraction = self.InteractionTypePan
         self.__WheelButtonInteraction = self.InteractionTypeZoom
+        self.__UserEventTag = ""
     
     def OnMouseMove(self):
-        if self.GetState() == self.VTKIS_SLICE_MOVE:
+        
+        if self.State == self.VTKIS_SLICE_MOVE:
             self.DefaultMoveAction()
             self.SliceMove()
-            self.InvokeEvent("SliceMoveEvent")
-        elif self.GetState() == self.VTKIS_NONE:
-            self.InvokeEvent("RequestedValueEvent")
-        else:
-            vtkPythonInteractorStyleImage.OnMouseMove(self)
+            self.__UserEventTag = "SliceMoveEvent"
+            self.InvokeEvent("UserEvent")
+            return
+        if self.State == self.VTKIS_NONE:
+            self.__UserEventTag = "RequestedValueEvent"
+            self.InvokeEvent("UserEvent")
+            return
+            
+        vtkPythonInteractorStyleImage.OnMouseMove(self)
+        return
     
     def OnLeftButtonDown(self):
         x,y = self.Interactor.GetEventPosition()
         if self.Interactor.GetRepeatCount():
             self.RequestedPosition[0] = x
             self.RequestedPosition[1] = y
-            self.InvokeEvent("RequestedPositionEvent")
+            self.__UserEventTag = "RequestedPositionEvent"
+            self.InvokeEvent("UserEvent")
             return 
         if (self.Interactor.GetShiftKey() or self.Interactor.GetControlKey()):
-            self.StartSliceMove()
+            if self.getLeftButtonInteraction() == self.InteractionTypeWindowLevel:
+                self.StartSliceMove()
         else:
             if self.getLeftButtonInteraction() == self.InteractionTypeSlice:
                 self.RequestedPosition[0] = x
                 self.RequestedPosition[1] = y
-                self.InvokeEvent("RequestedPositionEvent")
+                self.__UserEventTag = "RequestedPositionEvent"
+                self.InvokeEvent("UserEvent")
                 self.StartSliceMove()
             elif self.getLeftButtonInteraction() == self.InteractionTypeWindowLevel:
                 vtkPythonInteractorStyleImage.OnLeftButtonDown(self)
@@ -85,43 +96,123 @@ class vtkPythonInteractorStyleImage2D(vtkPythonInteractorStyleImage):
             pass  
           
     def OnMiddleButtonDown(self):
-        pass
+        x,y = self.Interactor.GetEventPosition()
+        self.FindPokedRenderer(x, y)
+        if not self.CurrentRenderer:
+            return
+        if self.getMiddleButtonInteraction() == self.InteractionTypeSlice:
+            self.StartSliceMove()
+        elif self.getMiddleButtonInteraction() == self.InteractionTypeWindowLevel:
+            vtkPythonInteractorStyleImage.OnLeftButtonDown(self)
+        elif self.getWheelButtonInteraction() == self.InteractionTypeZoom:
+            vtkPythonInteractorStyleImage.OnRightButtonDown(self)
+        elif self.getWheelButtonInteraction() == self.InteractionTypePan:
+            vtkPythonInteractorStyleImage.OnMiddleButtonDown(self)
+        else:
+            pass
     
     def OnMiddleButtonUp(self):
-        pass
+        if self.GetState() == self.VTKIS_SLICE_MOVE:
+            self.EndSliceMove()
+        
+        if self.getMiddleButtonInteraction() == self.InteractionTypeSlice:
+            pass
+        elif self.getMiddleButtonInteraction() == self.InteractionTypeZoom:
+            vtkPythonInteractorStyleImage.OnRightButtonUp(self)
+        elif self.getMiddleButtonInteraction() == self.InteractionTypePan:
+            vtkPythonInteractorStyleImage.OnMiddleButtonUp(self)
+        elif self.getMiddleButtonInteraction() == self.InteractionTypeWindowLevel:
+            vtkPythonInteractorStyleImage.OnLeftButtonUp(self)
+        else:
+            pass  
     
     def OnRightButtonDown(self):
-        pass
+        if self.getRightButtonInteraction() == self.InteractionTypeSlice:
+            self.StartSliceMove()
+        elif self.getRightButtonInteraction() == self.InteractionTypeZoom:
+            vtkPythonInteractorStyleImage.OnRightButtonDown(self)
+        elif self.getRightButtonInteraction() == self.InteractionTypePan:
+            vtkPythonInteractorStyleImage.OnMiddleButtonDown(self)
+        elif self.getRightButtonInteraction() == self.InteractionTypeWindowLevel:
+            vtkPythonInteractorStyleImage.OnLeftButtonDown(self)
+        else:
+            pass  
     
     def OnRightButtonUp(self):
-        pass
+        if self.GetState() == self.VTKIS_SLICE_MOVE:
+            self.EndSliceMove()
+        
+        if self.getRightButtonInteraction() == self.InteractionTypeSlice:
+            pass
+        elif self.getRightButtonInteraction() == self.InteractionTypeZoom:
+            vtkPythonInteractorStyleImage.OnRightButtonUp(self)
+        elif self.getRightButtonInteraction() == self.InteractionTypePan:
+            vtkPythonInteractorStyleImage.OnMiddleButtonUp(self)
+        elif self.getRightButtonInteraction() == self.InteractionTypeWindowLevel:
+            vtkPythonInteractorStyleImage.OnLeftButtonUp(self)
+        else:
+            pass  
     
     def OnMouseWheelForward(self):
-        pass
+        vtkPythonInteractorStyleImage.OnMouseWheelForward(self)
     
     def OnMouseWheelBackward(self):
-        pass
+        vtkPythonInteractorStyleImage.OnMouseWheelBackward(self)
     
     def OnChar(self):
-        pass
+        rwi = self.Interactor
+        print rwi.GetKeySym()
+        if rwi.GetKeySym() == "Up":
+            self.setSliceStep(1)
+            self.__UserEventTag = "SliceMoveEvent"
+            self.InvokeEvent("UserEvent")
+        elif rwi.GetKeySym() == "Down":
+            self.setSliceStep(-1)
+            self.__UserEventTag = "SliceMoveEvent"
+            self.InvokeEvent("UserEvent")
+        elif rwi.GetKeyCode() == 'r':
+            self.__UserEventTag = "ResetViewerEvent"
+            self.InvokeEvent("UserEvent")
+            
+        vtkPythonInteractorStyleImage.OnChar(self)
     
     def OnKeyDown(self):
-        pass
+#       Apparently there is a problem here.
+#       The event vtkCommand::CharEvent and vtkCommand::KeyPressEvent seem
+#       to mix between each other.
+#       tackled by calling the charevent
+#       (supposed to be called at any keyboard event)
+        self.OnChar()
+        vtkPythonInteractorStyleImage.OnKeyDown(self)
     
     def OnKeyUp(self):
-        pass
+        vtkPythonInteractorStyleImage.OnKeyUp(self)
     
     def StartSliceMove(self):
-        pass
+        if self.GetState()<>self.VTKIS_NONE and self.GetState()<>self.VTKIS_PICK:
+            return
+        self.StartState(self.VTKIS_SLICE_MOVE)
+        self.__UserEventTag = "StartSliceMoveEvent"
+        self.InvokeEvent("UserEvent")
+       
     
     def SliceMove(self):
-        pass
+        rwi = self.Interactor
+        dy = rwi.GetEventPosition()[1] - rwi.GetLastEventPosition()[1]
+        self.setSliceStep(dy)
     
     def EndSliceMove(self):
-        pass
+        if self.GetState() <> self.VTKIS_SLICE_MOVE:
+            return
+        self.StopState()
+        self.__UserEventTag = "EndSliceMoveEvent"
+        self.InvokeEvent("UserEvent")
+        
     
     def DefaultMoveAction(self):
-        pass
+        self.__UserEventTag = "DefaultMoveEvent"
+        self.InvokeEvent("UserEvent")
+        
     
     
     def getSliceStep(self):
@@ -178,6 +269,15 @@ class vtkPythonInteractorStyleImage2D(vtkPythonInteractorStyleImage):
         if value < self.InteractionTypeSlice or value > self.InteractionTypeZoom:
             return
         self.__WheelButtonInteraction = value
+
+
+    def getUserEventTag(self):
+        return self.__UserEventTag
+
+
+    def setUserEventTag(self, value):
+        self.__UserEventTag = value
+
 
     
     

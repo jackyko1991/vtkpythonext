@@ -4,6 +4,8 @@ Created on 2009-10-13
 @author: summit
 '''
 from jolly.jolly_vtk2.vtkPythonViewImage import *
+from jolly.jolly_vtk2.vtkPythonInteractorStyleImage2D import *
+from jolly.jolly_vtk2.vtkPythonViewImage2DCommand import *
 
 class vtkPythonViewImage2D(vtkPythonViewImage):
     '''
@@ -56,8 +58,8 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         self.__InteractorStyleSwitcher = None
         self.__InteractorStyleRubberZoom = None
         
-        #self.__Command = vtkViewImage2DCommand()
-        #self.__Command.SetViewer(self)
+        self.__Command = vtkPythonViewImage2DCommand()
+        self.__Command.setViewer(self)
         
         self.__AdjustmentTransform.Identity()
         self.__SliceImplicitPlane.SetOrigin(0,0,0)
@@ -151,7 +153,7 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         
     def SetOrientationMatrix(self, matrix):
         '''
-            Instead of setting the slice orientation to an axis (YZ - XZ - XY),
+        Instead of setting the slice orientation to an axis (YZ - XZ - XY),
          you can force the view to be axial (foot-head), coronal (front-back),
          or sagittal (left-right). It will just use the OrientationMatrix
          (GetOrientationMatrix()) to check which slice orientation to pick.
@@ -207,9 +209,9 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         if not self.GetInput() or not self.GetRenderer():
             return [0.0,0.0,0.0]
         slicepos = self.GetWorldCoordinatesForSlice(self.GetSlice())
-        self.GetRenderer().SetWorldPoint(slicepos[0], slicepos[1], slicepos[2])
+        self.GetRenderer().SetWorldPoint(slicepos)
         self.GetRenderer().WorldToDisplay()
-        self.GetRenderer().SetDisplayPoint(xy[0], xy[1], self.GetRenderer().GetDisplayPoint[2])
+        self.GetRenderer().SetDisplayPoint(xy[0], xy[1], self.GetRenderer().GetDisplayPoint()[2])
         self.GetRenderer().DisplayToWorld()
         return self.GetRenderer().GetWorldPoint()
     
@@ -763,21 +765,24 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
             self.GetRenderWindow().AddRenderer(self.GetRenderer())
         if self.GetInteractor():
             if self.getInteractorStyleType() == self.INTERACTOR_STYLE_NAVIGATION:
-                if not self.__InteractorStyle:
-                    self.__InteractorStyle = vtkPythonInteractorStyleImage2D()
-                    self.__InteractorStyle.SetPriority(1.0)
-                    
-                    self.__InteractorStyle.AddObserver("SliceMoveEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("ResetViewerEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("DefaultMoveEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("RequestedValueEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("StartWindowLevelEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("WindowLevelEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("CharEvent", self.__Command)
-                    self.__InteractorStyle.AddObserver("ResetWindowLevelEvent", self.__Command)
+                
+                self.__InteractorStyleSwitcher = vtkPythonInteractorStyleImage2D()
+                self.GetInteractor().SetInteractorStyle(None)
+                self.__InteractorStyleSwitcher.SetPriority(1.0)
+                
+                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                
+                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                self.__InteractorStyleSwitcher.AddObserver("UserEvent", lambda obj,event:self.__Command.Execute(obj,"UserEvent", self.__InteractorStyleSwitcher))
+                self.__InteractorStyleSwitcher.AddObserver("StartWindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"StartWindowLevelEvent", self.__InteractorStyleSwitcher))
+                self.__InteractorStyleSwitcher.AddObserver("WindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"WindowLevelEvent", self.__InteractorStyleSwitcher))
+                self.__InteractorStyleSwitcher.AddObserver("CharEvent", lambda obj,event:self.__Command.Execute(obj,"CharEvent", self.__InteractorStyleSwitcher))
+                self.__InteractorStyleSwitcher.AddObserver("ResetWindowLevelEvent", lambda obj,event:self.__Command.Execute(obj,"ResetWindowLevelEvent", self.__InteractorStyleSwitcher))
+                
     #                We don't observe the ResetWindowLevelEvent because it is already
     #                included in the ResetViewerEvent.
-                self.__InteractorStyleSwitcher = self.__InteractorStyle
+                #self.__InteractorStyleSwitcher = self.GetInteractorStyle()
             elif self.getInteractorStyleType() == self.INTERACTOR_STYLE_RUBBER_ZOOM:
                 if not self.__InteractorStyleRubberZoom:
                     self.__InteractorStyleRubberZoom = vtk.vtkInteractorStyleRubberBandZoom()
@@ -970,21 +975,22 @@ if __name__ == "__main__":
     view1.SetupInteractor(iren1)
     view1.SetBackground(0.0, 0.0, 0.0)
     view1.SetSliceOrientationToXY()
-    view1.SetInteractorStyleTypeToRubberZoom()
+    view1.SetInteractorStyleTypeToNavigation()
     
     view2 = vtkPythonViewImage2D()
     iren2 = vtk.vtkRenderWindowInteractor()
     view2.SetupInteractor(iren2)
     view2.SetBackground(0.0, 0.0, 0.0)
     view2.SetSliceOrientationToXZ()
-    view2.SetInteractorStyleTypeToRubberZoom()
+    view2.SetInteractorStyleTypeToNavigation()
     
     view3 = vtkPythonViewImage2D()
     iren3 = vtk.vtkRenderWindowInteractor()
     view3.SetupInteractor(iren3)
     view3.SetBackground(0.0, 0.0, 0.0)
     view3.SetSliceOrientationToYZ()
-    view3.SetInteractorStyleTypeToRubberZoom()
+    view3.SetInteractorStyleTypeToNavigation()
+ 
     
     reader = ImageSeriesReader(sys.argv[1])
 #    v16 = vtk.vtkVolume16Reader()
