@@ -402,6 +402,9 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
         v_max = s + 0.5*self.GetColorWindow()
         self.getLookupTable().SetRange(v_min, v_max)
     
+    def SetAboutData(self, s):
+        self.__CornerAnnotation.SetText(0, s)
+        
     def ResetWindowLevel(self):
         '''
         Reset the window level

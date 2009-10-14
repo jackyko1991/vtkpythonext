@@ -60,7 +60,7 @@ class vtkPythonViewImage2DCommand(vtk.vtkObject):
         @return: None
         '''
         isi = callData
-        print event, ":", isi.getUserEventTag()
+        
         if not isi or not self.__Viewer or not self.__Viewer.GetInput():
             return
         
