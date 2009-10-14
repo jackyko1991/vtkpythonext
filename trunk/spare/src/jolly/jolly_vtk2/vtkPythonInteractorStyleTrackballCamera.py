@@ -17,7 +17,7 @@ Created on 2009-9-17
 """
 
 import vtk
-from jolly.jolly_vtk.vtkPythonInteractorStyle import *
+from jolly.jolly_vtk2.vtkPythonInteractorStyle import *
 import math
 
 class vtkPythonInteractorStyleTrackballCamera(vtkPythonInteractorStyle):

@@ -10,7 +10,7 @@ Because it's not exsit a vtk class support python to add customize the interacti
 we rewrite a new python class.
 """
 import vtk
-from jolly.jolly_vtk.vtkPythonInteractorObserver import *
+from jolly.jolly_vtk2.vtkPythonInteractorObserver import *
 
 class vtkPythonInteractorStyle(vtkPythonInteractorObserver):
     VTKIS_START = 0
