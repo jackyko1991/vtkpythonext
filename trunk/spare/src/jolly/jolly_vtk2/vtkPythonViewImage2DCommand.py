@@ -19,6 +19,7 @@ class vtkPythonViewImage2DCommand(vtk.vtkObject):
     ResetViewerEvent = 1006
     DefaultMoveEvent = 1007
     
+    
     def __init__(self):
         '''
         Constructor
@@ -32,6 +33,7 @@ class vtkPythonViewImage2DCommand(vtk.vtkObject):
         self.__DistanceWidget.KeyPressActivationOff()
         self.__DistanceWidget.CreateDefaultRepresentation()
         self.__DistanceWidget.SetKeyPressActivationValue('d')
+        
         
         rep1 = vtk.vtkDistanceRepresentation2D.SafeDownCast(self.__DistanceWidget.GetRepresentation())
         rep1.GetAxis().SetTickLength(6)
@@ -141,9 +143,12 @@ class vtkPythonViewImage2DCommand(vtk.vtkObject):
             elif rwi.GetKeyCode() == 'd':
                 self.__DistanceWidget.SetInteractor(rwi)
                 self.__DistanceWidget.SetEnabled(not self.__DistanceWidget.GetEnabled())
+                # Becase we could not have GrapFouce in Python , So we only end the message by StopState
+                self.__DistanceWidget.AddObserver("StartInteractionEvent", lambda obj, event: isi.StopState()) 
             elif rwi.GetKeyCode() == 'a':    
                 self.__AngleWidget.SetInteractor(rwi)
                 self.__AngleWidget.SetEnabled(not self.__AngleWidget.GetEnabled())
+                self.__AngleWidget.AddObserver("StartInteractionEvent", lambda obj, event: isi.StopState()) 
             return
         # Start Slice Move 
         if event == "UserEvent" and isi.getUserEventTag()=="StartSliceMoveEvent":    
