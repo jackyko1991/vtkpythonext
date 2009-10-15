@@ -334,6 +334,18 @@ class vtkPythonViewImageCollection(vtk.vtkCollection):
             item.ResetWindowLevel()
             item = self.GetNextItem()
     
+    def SyncSetRefWindowLevel(self, w, l):
+        '''
+        @param w: double
+        @param l: double  
+        '''
+        self.InitTraversal()
+        item = self.GetNextItem()
+        while item:
+            item.setRefWindow(w)
+            item.setRefLevel(l)
+            item = self.GetNextItem()
+    
     def SyncRender(self):
         self.InitTraversal()
         item = self.GetNextItem()
