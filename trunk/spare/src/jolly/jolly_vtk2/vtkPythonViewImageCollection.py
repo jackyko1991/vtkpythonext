@@ -184,7 +184,8 @@ class vtkPythonViewImageCollection(vtk.vtkCollection):
         self.InitTraversal()
         item = self.GetNextItem()
         while item:
-            item.SetViewOrientation(arg)
+            if (isinstance(item, vtkPythonViewImage2D)):
+                item.SetViewOrientation(arg)
             item = self.GetNextItem()
     
     def SyncSetViewConvention(self, arg):
@@ -194,7 +195,8 @@ class vtkPythonViewImageCollection(vtk.vtkCollection):
         self.InitTraversal()
         item = self.GetNextItem()
         while item:
-            item.SetViewConvention(arg)
+            if (isinstance(item, vtkPythonViewImage2D)):
+                item.SetViewConvention(arg)
             item = self.GetNextItem()
     
     def SyncSetInterpolate(self, arg):
@@ -204,7 +206,8 @@ class vtkPythonViewImageCollection(vtk.vtkCollection):
         self.InitTraversal()
         item = self.GetNextItem()
         while item:
-            item.SetInterpolate(arg)
+            if (isinstance(item, vtkPythonViewImage2D)):
+                item.SetInterpolate(arg)
             item = self.GetNextItem()
     
     def SyncSetInteractorStyleType(self, arg):
@@ -214,7 +217,8 @@ class vtkPythonViewImageCollection(vtk.vtkCollection):
         self.InitTraversal()
         item = self.GetNextItem()
         while item:
-            item.SetInteractorStyleType(arg)
+            if (isinstance(item, vtkPythonViewImage2D)):
+                item.SetInteractorStyleType(arg)
             item = self.GetNextItem()
     
     def SyncSetOrientationMatrix(self, arg):
@@ -390,7 +394,8 @@ class vtkPythonViewImageCollectionCommand(vtk.vtkObject):
         v = self.getCollection().GetNextItem()
         viewer = None
         while v:
-            if isi == v.getInteractorStyleSwitcher():
+            if (isinstance(v, vtkPythonViewImage2D) and 
+                isi == v.getInteractorStyleSwitcher()):
                 viewer = v
             v = self.getCollection().GetNextItem()
         if not isi or not viewer or not viewer.GetInput():

@@ -298,7 +298,8 @@ class vtkPythonInteractorStyle(vtkPythonInteractorObserver):
             if picker <> None:
                 path = picker.GetPath()
             if path <> None:
-                rwi.FlyTo(self.CurrentRenderer, picker.GetPickPosition())
+                rwi.FlyTo(self.CurrentRenderer, picker.GetPickPosition()[0],
+                          picker.GetPickPosition()[1], picker.GetPickPosition()[2])
             self.AnimState = self.VTKIS_ANIM_OFF   
         elif keyCode in ['u', 'U']:
             rwi.UserCallback()
@@ -311,10 +312,10 @@ class vtkPythonInteractorStyle(vtkPythonInteractorObserver):
             self.FindPokedRenderer(rwi.GetEventPosition()[0], 
                                    rwi.GetEventPosition()[1])
             ac = self.CurrentRenderer.GetActors()
-            ait = None
-            ac.InitTraversal(ait)
+            
+            ac.InitTraversal()
             while True:
-                anActor = ac.GetNextActor(ait)
+                anActor = ac.GetNextActor()
                 if anActor <> None:
                     anActor.InitPathTraversal()
                     while True:
@@ -331,10 +332,10 @@ class vtkPythonInteractorStyle(vtkPythonInteractorObserver):
             self.FindPokedRenderer(rwi.GetEventPosition()[0], 
                                    rwi.GetEventPosition()[1])
             ac = self.CurrentRenderer.GetActors()
-            ait = None
-            ac.InitTraversal(ait)
+           
+            ac.InitTraversal()
             while True:
-                anActor = ac.GetNextActor(ait)
+                anActor = ac.GetNextActor()
                 if anActor <> None:
                     anActor.InitPathTraversal()
                     while True:
