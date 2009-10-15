@@ -32,6 +32,6 @@ ImageProcessingState.Error = ImageProcessingState("Error")
 #itkpixeltype = {"unsigned_char":itk.UC, "char":itk.SC, "unsigned_short":itk.US, 
 #                "short":itk.SS, "unsigned_int":itk.UI, "int":itk.SI, 
 #                "unsigned_long":itk.UL, "long":itk.SI, "float":itk.F, "double":itk.D }
-itkpixeltype = {"unsigned_char":itk.UC, "char":itk.SC, "unsigned_short":itk.US, 
-                "short":itk.US, "unsigned_int":itk.UI, "int":itk.F, 
+itkpixeltype = {"unsigned_char":itk.UC, "char":itk.SC, "unsigned_short":itk.F, 
+                "short":itk.F, "unsigned_int":itk.UI, "int":itk.F, 
                 "unsigned_long":itk.UL, "long":itk.F, "float":itk.F, "double":itk.D }
