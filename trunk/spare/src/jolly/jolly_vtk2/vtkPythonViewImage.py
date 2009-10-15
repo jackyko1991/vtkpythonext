@@ -110,6 +110,11 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
         self.__CornerAnnotation.SetImageActor(self.__ImageActor)
         self.__CornerAnnotation.ShowSliceAndImageOn()
         
+        # Sometime we would want to set the default window/level value instead
+        # of the ImageData's ScalarRange
+        self.__RefWindow = None
+        self.__RefLevel = None
+        
     
     def SetInput(self, input):
         '''
@@ -412,10 +417,16 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
         '''
         if not self.GetInput():
             return
+        
         range = self.GetInput().GetScalarRange()
         window = range[1] - range[0]
         level = 0.5*(range[1]+range[0])
         
+        if self.__RefLevel:
+            level = self.__RefLevel
+        if self.__RefWindow:
+            window = self.__RefWindow
+        print level, window
         self.SetColorWindow(window)
         self.SetColorLevel(level)
     
@@ -594,6 +605,23 @@ class vtkPythonViewImage(vtk.vtkImageViewer2):
         '''
         self.__ShowScalarBar = value
         self.ScalarBarActor.SetVisibility(value)
+
+
+    def getRefWindow(self):
+        return self.__RefWindow
+
+
+    def getRefLevel(self):
+        return self.__RefLevel
+
+
+    def setRefWindow(self, value):
+        self.__RefWindow = value
+
+
+    def setRefLevel(self, value):
+        self.__RefLevel = value
+
 
 if __name__ == '__main__':
     import sys
