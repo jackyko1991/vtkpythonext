@@ -762,7 +762,23 @@ if __name__=="__main__":
     from jolly.jolly_vtk2.vtkPythonViewImageCollection import *
     
     from vtk.util.misc import vtkGetDataRoot
-    sys.argv.append("C:/head")
+    sys.argv.append("C:/S70")
+    matrix = vtk.vtkMatrix4x4()
+    matrix.DeepCopy([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1])
+#    matrix.Identity()
+#    matrix.SetElement(0, 0, 1)
+#    matrix.SetElement(0, 1, 1)
+#    matrix.SetElement(0, 2, 1)
+#    matrix.SetElement(1, 0, 1)
+#    matrix.SetElement(1, 1, 1)
+#    matrix.SetElement(1, 2, 1)
+#    matrix.SetElement(2, 0, 1)
+#    matrix.SetElement(2, 1, 1)
+#    matrix.SetElement(2, 2, 1)
+#    matrix.SetElement(3, 0, 1)
+#    matrix.SetElement(3, 1, 1)
+#    matrix.SetElement(3, 2, 1)
+    
     
     if len(sys.argv)<2:
         sys.exit("Usage:\n\t%s <image file>\nExample: \n\t%s [vtkINRIA3D_DATA_DIR]/MRI.vtk\n" 
@@ -771,9 +787,10 @@ if __name__=="__main__":
     pool = vtkPythonViewImageCollection()
     reader = ImageSeriesReader(sys.argv[1])
     image = vtk.vtkImageData()
-    image.DeepCopy(reader.ReadToVTK(".dcm"))
+    image.DeepCopy(reader.ReadToVTK(""))
     image.SetOrigin(0,0,0)
     
+
     view3d = vtkPythonViewImage3D()
     iren3d = vtk.vtkRenderWindowInteractor()
     view3d.SetupInteractor(iren3d)
@@ -784,36 +801,43 @@ if __name__=="__main__":
     iren = vtk.vtkRenderWindowInteractor()
     view.SetupInteractor(iren)
     view.SetInput(image)
-    view.SetAboutData("C:/head")
+    view.SetAboutData("C:/S70")
     view.SetInteractorStyleTypeToNavigation()
     view.setViewOrientation(vtkPythonViewImage2D.VIEW_ORIENTATION_AXIAL) 
+    view.setOrientationMatrix(matrix)
     pool.AddItem(view) # "AddItem" function should be invoke at last
     view3d.Add2DPhantom(view.GetImageActor())
+    print view.getOrientationMatrix()
     
 
     view2 = vtkPythonViewImage2D()
     iren2 = vtk.vtkRenderWindowInteractor()
     view2.SetupInteractor(iren2)
     view2.SetInput(image)
-    view2.SetAboutData("C:/head")
+    view2.SetAboutData("C:/S70")
     view2.setViewOrientation(vtkPythonViewImage2D.VIEW_ORIENTATION_SAGITTAL)
     view2.SetInteractorStyleTypeToNavigation()
+#    view2.setOrientationMatrix(matrix)
     pool.AddItem(view2)
     view3d.Add2DPhantom(view2.GetImageActor())
+    print view2.getOrientationMatrix()
     
     view3 = vtkPythonViewImage2D()
     iren3 = vtk.vtkRenderWindowInteractor()
     view3.SetupInteractor(iren3)
     view3.SetInput(image)
-    view3.SetAboutData("C:/head")
+    view3.SetAboutData("C:/S70")
     view3.setViewOrientation(vtkPythonViewImage2D.VIEW_ORIENTATION_CORONAL)
     view3.SetInteractorStyleTypeToNavigation()
+#    view3.setOrientationMatrix(matrix)
     pool.AddItem(view3)
     view3d.Add2DPhantom(view3.GetImageActor())
+    print view3.getOrientationMatrix()
     
     firstview = pool.GetItem(1)
     if firstview:
         view3d.SetInput(firstview.GetInput())
+#        view3d.setOrientationMatrix(matrix)
 #        view3d.SetRenderingModeToPlanar()
         view3d.SetRenderingModeToVR()
         view3d.InstallPipeline()
@@ -821,9 +845,10 @@ if __name__=="__main__":
     
     pool.SyncSetSize([400,400])
     pool.InstallCrossAxes()
-    
+#    pool.SyncSetRefWindowLevel(1650,-1350)
     pool.SyncReset()
     pool.SyncRender()
+    
     #pool.InstallCrossAxes()
     pool.SyncStart() # // Starts all the render interactors related to the pool
     
