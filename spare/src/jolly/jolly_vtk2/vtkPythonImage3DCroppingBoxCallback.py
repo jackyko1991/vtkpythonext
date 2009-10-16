@@ -59,7 +59,7 @@ class vtkPythonImage3DCroppingBoxCallback(vtk.vtkObject):
         if xmax<bounds[1]: xmax=bounds[1]
         if ymax<bounds[3]: ymax=bounds[3]
         if zmax<bounds[5]: zmax=bounds[5]
-        print xmin, xmax, ymin, ymax, zmin, zmax
+        
         self.__VolumeMapper.SetCroppingRegionPlanes(xmin, xmax, ymin, ymax, zmin, zmax)
 #        del myBox
         
