@@ -310,8 +310,7 @@ class vtkPythonViewImage2D(vtkPythonViewImage):
         '''
         @return: double[3]
         '''
-        return self.__ViewCenter
-    
+        pass
     def Update(self):
         self.UpdateOrientation()
         pass

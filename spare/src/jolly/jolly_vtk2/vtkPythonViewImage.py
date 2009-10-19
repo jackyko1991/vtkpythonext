@@ -627,7 +627,7 @@ if __name__ == '__main__':
     import sys
     from jolly.ImageSeriesReader import *
     from vtk.util.misc import vtkGetDataRoot
-    sys.argv.append("C:/head")
+    sys.argv.append("C:/S70")
     
     if len(sys.argv)<2:
         sys.exit("Usage:\n\t%s <image file>\nExample: \n\t%s [vtkINRIA3D_DATA_DIR]/MRI.vtk\n" 
@@ -656,7 +656,7 @@ if __name__ == '__main__':
     
     image = vtk.vtkImageData()
     # must use deepcopy the convert imagedata
-    image.DeepCopy(reader.ReadToVTK(".dcm"))    
+    image.DeepCopy(reader.ReadToVTK(""))    
     
     image.SetOrigin(0,0,0)
     view1.SetInput(image)
